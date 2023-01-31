@@ -1,20 +1,26 @@
 const socket = io()
+const input = document.getElementById("input")
+const form = document.getElementById("form")
+const button = document.querySelector("#submit")
+const sendLocation = document.getElementById('send-location')
 
 socket.on('message', (message) => {
     console.log(message);
 })
 
 
-let input = document.getElementById("input")
-
-document
-    .getElementById("form")
+form
     .addEventListener('submit', (e) => {
         e.preventDefault()
+        button.setAttribute('disabled', 'disabled')
         if (input.value === "") {
+            button.removeAttribute('disabled')
+            input.focus()
             return alert('Cannot send empty message')
         }
         socket.emit('sendMessage', input.value, (error) => {
+            button.removeAttribute('disabled')
+            input.focus()
             if (error) {
                 return alert(error)
             }
@@ -23,9 +29,9 @@ document
         })
     })
 
-document
-    .getElementById('send-location')
+sendLocation
     .addEventListener('click', () => {
+        sendLocation.setAttribute('disabled', 'disabled')
         let locator = navigator.geolocation
         if (!locator) {
             return console.log("Can't find location")
@@ -36,4 +42,5 @@ document
                 console.log("Location shared to the console successfully")
             })
         })
+        sendLocation.removeAttribute('disabled')
     })
