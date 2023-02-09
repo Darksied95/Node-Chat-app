@@ -10,8 +10,9 @@ const locationTemplate = document.getElementById("location-template").innerHTML
 
 
 socket.on('message', (messageObject) => {
-    console.log(messageObject);
-    const html = Mustache.render(messageTemplate, { message: messageObject.text })
+    const html = Mustache.render(messageTemplate, {
+        message: messageObject.text, createdAt: moment(messageObject.createdAt).format('h:mm a')
+    })
     messages.insertAdjacentHTML('beforeend', html)
 
 
@@ -19,7 +20,8 @@ socket.on('message', (messageObject) => {
 
 socket.on('locationHandler', (locationObject) => {
     const html = Mustache.render(locationTemplate, {
-        location: locationObject.text
+        location: locationObject.url,
+        createdAt: moment(locationObject.createdAt).format('h:mm a')
     })
     messages.insertAdjacentHTML('beforeend', html)
 })
@@ -57,6 +59,7 @@ sendLocation
             return console.log("Can't find location")
         }
 
+        console.log('workimg');
         navigator.geolocation.getCurrentPosition(({ coords: { latitude: lat, longitude: long } }) => {
             socket.emit('sendLocation', { lat, long }, () => {
                 console.log("Location shared to the console successfully")

@@ -4,7 +4,8 @@ const path = require('path')
 const http = require('http')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
-const { generateMessage } = require('./utils/generateMessage')
+const { generateMessage } = require('./utils/message')
+const { generateLocation } = require('./utils/message')
 
 
 const publicDirectory = path.join(__dirname, '../public')
@@ -44,7 +45,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on('sendLocation', (coords, callback) => {
-        socket.emit('locationHandler', generateMessage(`https://google.com/maps/?q=${coords.lat},${coords.long}`))
+        io.emit('locationHandler', generateLocation(`https://google.com/maps/?q=${coords.lat},${coords.long}`))
         callback()
     })
 })
