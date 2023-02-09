@@ -3,12 +3,20 @@ const input = document.getElementById("input")
 const form = document.getElementById("form")
 const button = document.querySelector("#submit")
 const sendLocation = document.getElementById('send-location')
+const messages = document.getElementById('messages')
+const messageTemplate = document.getElementById("message-template").innerHTML
+
+
 
 socket.on('message', (message) => {
     console.log(message);
+    const html = Mustache.render(messageTemplate, { message })
+    messages.insertAdjacentHTML('beforeend', html)
 })
 
-
+socket.on('locationHandler', (message) => {
+    console.log(message);
+})
 form
     .addEventListener('submit', (e) => {
         e.preventDefault()
