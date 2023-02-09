@@ -4,6 +4,7 @@ const path = require('path')
 const http = require('http')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
+const { generateMessage } = require('./utils/generateMessage')
 
 
 const publicDirectory = path.join(__dirname, '../public')
@@ -22,9 +23,9 @@ const message = 'Welcome!!!'
 
 io.on('connection', (socket) => {
 
-    socket.emit('message', message)
+    socket.emit('message', generateMessage(message))
 
-    socket.broadcast.emit('message', 'A new user has joined')
+    socket.broadcast.emit('message', generateMessage('A new user has joined'))
 
     socket.on('sendMessage', (message, callback) => {
 
@@ -34,16 +35,16 @@ io.on('connection', (socket) => {
             return callback('Profane word(s) found')
         }
 
-        io.emit('message', message)
+        io.emit('message', generateMessage(message))
         callback()
     })
 
     socket.on('disconnect', () => {
-        io.emit('message', 'User has logged off')
+        io.emit('message', generateMessage('User has logged off'))
     })
 
     socket.on('sendLocation', (coords, callback) => {
-        socket.emit('locationHandler', `https://google.com/maps/?q=${coords.lat},${coords.long}`)
+        socket.emit('locationHandler', generateMessage(`https://google.com/maps/?q=${coords.lat},${coords.long}`))
         callback()
     })
 })

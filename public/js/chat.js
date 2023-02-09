@@ -9,35 +9,41 @@ const locationTemplate = document.getElementById("location-template").innerHTML
 
 
 
-socket.on('message', (message) => {
-    console.log(message);
-    const html = Mustache.render(messageTemplate, { message })
+socket.on('message', (messageObject) => {
+    console.log(messageObject);
+    const html = Mustache.render(messageTemplate, { message: messageObject.text })
     messages.insertAdjacentHTML('beforeend', html)
 
 
 })
 
-socket.on('locationHandler', (location) => {
+socket.on('locationHandler', (locationObject) => {
     const html = Mustache.render(locationTemplate, {
-        location
+        location: locationObject.text
     })
     messages.insertAdjacentHTML('beforeend', html)
 })
 form
     .addEventListener('submit', (e) => {
         e.preventDefault()
+
         button.setAttribute('disabled', 'disabled')
+
         if (input.value === "") {
             button.removeAttribute('disabled')
             input.focus()
             return alert('Cannot send empty message')
         }
+
         socket.emit('sendMessage', input.value, (error) => {
+
             button.removeAttribute('disabled')
+
             input.focus()
             if (error) {
                 return alert(error)
             }
+
             console.log('Message Delivered');
             input.value = ""
         })
