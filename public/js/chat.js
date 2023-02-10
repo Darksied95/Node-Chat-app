@@ -67,3 +67,6 @@ sendLocation
         })
         sendLocation.removeAttribute('disabled')
     })
+
+let a = Qs.parse(location.search)
+console.log(a);
