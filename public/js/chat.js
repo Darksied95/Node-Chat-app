@@ -8,6 +8,7 @@ const messageTemplate = document.getElementById("message-template").innerHTML
 const locationTemplate = document.getElementById("location-template").innerHTML
 
 
+let { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true })
 
 socket.on('message', (messageObject) => {
     const html = Mustache.render(messageTemplate, {
@@ -25,6 +26,9 @@ socket.on('locationHandler', (locationObject) => {
     })
     messages.insertAdjacentHTML('beforeend', html)
 })
+
+
+socket.emit('join', { username, room })
 form
     .addEventListener('submit', (e) => {
         e.preventDefault()
@@ -68,5 +72,5 @@ sendLocation
         sendLocation.removeAttribute('disabled')
     })
 
-let a = Qs.parse(location.search)
-console.log(a);
+
+
