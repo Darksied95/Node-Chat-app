@@ -5,7 +5,7 @@ const http = require('http')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
 const { generateMessage, generateLocation } = require('./utils/message')
-const { addUser, removeUser, getUser, getUserInRoom } = require('./utils/users')
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users')
 
 const publicDirectory = path.join(__dirname, '../public')
 
@@ -25,12 +25,22 @@ io.on('connection', (socket) => {
 
     socket.on('join', (options, callback) => {
         const { error, user } = addUser({ id: socket.id, ...options })
-        if (error) {
-            return callback(error)
-        }
+
+        if (error) return callback(error)
+
+        user.username = user.username[0].toUpperCase() + user.username.slice(1)
+
         socket.join(user.room)
+
         socket.emit('message', generateMessage('Admin', 'Welcome!'))
-        socket.broadcast.to(user.room).emit('message', generateMessage(`${user.username} has joined`))
+
+        socket.broadcast.to(user.room).emit('message', generateMessage('Admin', `${user.username} has joined`))
+
+        io.to(user.room).emit('roomData', {
+            room: user.room,
+            users: getUsersInRoom(user.room)
+        })
+
         callback()
     })
 
@@ -57,7 +67,12 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         const user = removeUser(socket.id)
         if (user) {
-            io.to(user.room).emit('message', generateMessage(`${user.username} has left`))
+            user.username = user.username[0].toUpperCase() + user.username.slice(1)
+            io.to(user.room).emit('message', generateMessage('Admin', `${user.username} has left`))
+            io.to(user.room).emit('roomData', {
+                room: user.room,
+                users: getUsersInRoom(user.room)
+            })
 
         }
     })
